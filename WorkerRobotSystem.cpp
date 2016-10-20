@@ -106,20 +106,23 @@ void WorkerRobotSystem::moveTo(Point dest) {
 }
 
 void WorkerRobotSystem::move(direction dir, int distance) {
+	ofstream myfile;
+	myfile.open("output.txt", std::ofstream::out | std::ofstream::app);
 	switch (dir) {
 	case LEFT:
-		cout << distance << "L\n";
+		myfile << distance << "L\n";
 		break;
 	case RIGHT:
-		cout << distance << "R\n";
+		myfile << distance << "R\n";
 		break;
 	case DOWN:
-		cout << distance << "D\n";
+		myfile << distance << "D\n";
 		break;
 	case UP:
-		cout << distance << "U\n";
+		myfile << distance << "U\n";
 		break;
 	default:
 		break;
+		myfile.close();
 	}
 }

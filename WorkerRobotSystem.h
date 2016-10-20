@@ -4,6 +4,7 @@
 #include "Warehouse.h"
 #include "Point.h"
 #include <iostream>
+#include <fstream>
 #include <queue>
 #include <thread>
 
