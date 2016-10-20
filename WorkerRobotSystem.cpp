@@ -31,7 +31,6 @@ void WorkerRobotSystem::loop() {
 				route.pop_back();
 			}
 			moveTo(wh.getCollectionPoint());
-			cout << "Dropping..\n";
 			//TODO drop items
 		}
 	}
