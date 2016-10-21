@@ -1,4 +1,8 @@
-﻿  WorkerRobotSystem.cpp
+﻿  RobotController.cpp
+  Warehouse.cpp
+  Point.cpp
   TaskDistributer.cpp
+  Item.cpp
   Generating Code...
+c:\users\k.de.coster\documents\visual studio 2015\projects\brainrobot\robot_lib\taskdistributer.cpp(69): warning C4172: returning address of local variable or temporary: robot
   robot_lib.vcxproj -> C:\Users\k.de.coster\Documents\Visual Studio 2015\Projects\brainRobot\Debug\robot_lib.lib

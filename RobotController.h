@@ -3,6 +3,7 @@
 
 #include "Warehouse.h"
 #include "Point.h"
+#include "Item.h"
 #include <iostream>
 #include <fstream>
 #include <queue>
@@ -16,7 +17,8 @@ class RobotController {
 public:
 	RobotController(Warehouse& wh, Point& location, int containerVolume);
 	virtual ~RobotController();
-	void addArticlesToBePicked(queue<int> articlesToPick);
+	void addItemsToBePicked(queue<Item> itemsToPick);
+	void addItemToPick(Item item);
 	bool isDone(void);
 	const Warehouse& getWarehouse() const;
 private:

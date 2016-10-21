@@ -66,11 +66,16 @@ vector<int> RobotController:: findBestRoute(vector<int> route) {
 }
 
 
-void RobotController::addArticlesToBePicked(queue<int> articles) {
-	while (!articles.empty()) {
-		this->articlesToBePicked.push(articles.front());
-		articles.pop();
+void RobotController::addItemsToBePicked(queue<Item> itemsToPick) {
+	while (!itemsToPick.empty()) {
+		this->articlesToBePicked.push(itemsToPick.front().getStorageUnit());
+		itemsToPick.pop();
 	}
+}
+
+void RobotController::addItemToPick(Item item)
+{
+	this->articlesToBePicked.push(item.getStorageUnit());
 }
 
 bool RobotController::isDone() {

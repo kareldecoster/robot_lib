@@ -4,9 +4,11 @@
 #define TASKDISTRIBUTER_H_
 
 #include <list>
+#include <queue>
 #include "RobotController.h"
 #include "Warehouse.h"
 #include "Point.h"
+#include "Item.h"
 #include <algorithm>
 #include <iostream>
 
@@ -14,9 +16,6 @@
 using namespace std;
 
 class TaskDistributer {
-	list<Warehouse> warehouses;
-	list<RobotController> robots;
-
 public:
 	TaskDistributer();
 	void addWarehouse(Warehouse wh);
@@ -25,7 +24,13 @@ public:
 	void print();
 	void addRobotController(RobotController robot);
 	void removeRobotController(RobotController robot);
+	void giveOrdersToRobotControllers(queue<Item> orders);
 	virtual ~TaskDistributer();
+private:
+	list<Warehouse> warehouses;
+	list<RobotController> robots;
+
+	RobotController* getRobotByWarehouse(Warehouse wh);
 };
 
 #endif /* TASKDISTRIBUTER_H_ */
