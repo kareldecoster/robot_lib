@@ -2,32 +2,29 @@
 
 RobotController::RobotController(Warehouse& wh, Point& location, int containerVolume) : wh(wh), position(location) {
 	this->containerVolume = containerVolume;
-	done = 0;
-	robot_thread = new thread(&RobotController::loop, this);
+	readerDone = 0;
+	reader = new thread(&RobotController::readerLoop, this);
 }
 
-void RobotController::loop() {
-	while (!done) {
+void RobotController::readerLoop() {
+	while (!readerDone) {
 		while (!articlesToBePicked.empty()) {
 
-			//TODO make sublist of items to pick this round
-			vector<int> picking_list;
+			vector<int> pickListForThisRun;
 			int plannedVolume = 0;
 			//TODO add size to articles..
 			while (plannedVolume + 1 <= containerVolume && !articlesToBePicked.empty()) {
-				picking_list.push_back(articlesToBePicked.front());
-				//cout << "planning : " << articlesToBePicked.front() << endl;
+				pickListForThisRun.push_back(articlesToBePicked.front());
+
 				articlesToBePicked.pop();
 				plannedVolume += 1;
 			}
-			//TODO optimize route
-			vector<int> route = find_best_route(picking_list);
+			vector<int> route = findBestRoute(pickListForThisRun);
 			
 			//Pick the items of this route
 			while (!route.empty()) {
 				moveTo(wh.getPositionOfStorageUnit(route.back()));
 				//pick
-				//cout << "moving :"<< route.back() << endl;
 				route.pop_back();
 			}
 			moveTo(wh.getCollectionPoint());
@@ -36,12 +33,17 @@ void RobotController::loop() {
 	}
 }
 
-vector<int> RobotController:: find_best_route(vector<int> route) {
+vector<int> RobotController:: findBestRoute(vector<int> route) {
 	int size = route.size();
 	int best_path = INT_MAX;
 	vector<int>best_route;
 	do {
 		int curr_path = 0;
+
+		//Add distance from start to first item
+		curr_path += wh.getPositionOfStorageUnit(route.at(0))
+			.distanceTo(wh.getCollectionPoint());
+
 		for (int i = 0; i < size; i++) {
 
 			if (i > 0) {
@@ -49,9 +51,7 @@ vector<int> RobotController:: find_best_route(vector<int> route) {
 					.distanceTo(wh.getPositionOfStorageUnit(route.at(i-1)));
 			}
 		}
-		//Add distance from start to first item
-		curr_path += wh.getPositionOfStorageUnit(route.at(0))
-			.distanceTo(wh.getCollectionPoint());
+
 		//Add distance from last item to drop off
 		curr_path += wh.getPositionOfStorageUnit(route.at(size-1))
 			.distanceTo(wh.getCollectionPoint());
@@ -82,10 +82,10 @@ const Warehouse& RobotController::getWarehouse() const {
 }
 
 RobotController::~RobotController() {
-	done = 1;
-	robot_thread->join();
-	delete robot_thread;
-	robot_thread = NULL;
+	readerDone = 1;
+	reader->join();
+	delete reader;
+	reader = NULL;
 }
 
 void RobotController::moveTo(Point dest) {

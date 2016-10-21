@@ -10,7 +10,7 @@ public:
 	Point(int x, int y);
 	Point(const Point& orig);
 	virtual ~Point();
-	int distanceTo(Point dest);
+	virtual int distanceTo(Point dest);
 	
 	int getX() const {
 		return x;

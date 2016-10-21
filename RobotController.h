@@ -16,7 +16,7 @@ class RobotController {
 public:
 	RobotController(Warehouse& wh, Point& location, int containerVolume);
 	virtual ~RobotController();
-	void addArticlesToBePicked(queue<int> articles);
+	void addArticlesToBePicked(queue<int> articlesToPick);
 	bool isDone(void);
 	const Warehouse& getWarehouse() const;
 private:
@@ -24,13 +24,13 @@ private:
 	queue<int> articlesToBePicked;
 	Point position;
 	int containerVolume;
-	thread* robot_thread;
-	volatile int done;
+	thread* reader;
+	volatile int readerDone;
 
-	void loop();
+	void readerLoop();
 	void moveTo(Point dest);
 	void move(direction dir, int distance);
-	vector<int> RobotController::find_best_route(vector<int> pickingQ);
+	vector<int> findBestRoute(vector<int> subOptimalRouteOfStorageUnits);
 };
 
 #endif /* ROBOTCONTROLLER_H_ */
