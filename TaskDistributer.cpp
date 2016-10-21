@@ -28,6 +28,16 @@ void TaskDistributer::print() {
 	cout << warehouses.size() << endl;
 }
 
+void TaskDistributer::addRobotController(RobotController robot)
+{
+	this->robots.push_back(robot);
+}
+
+void TaskDistributer::removeRobotController(RobotController robot)
+{	
+	this->robots.remove(robot);
+}
+
 TaskDistributer::~TaskDistributer() {
 	// TODO Auto-generated destructor stub
 }
