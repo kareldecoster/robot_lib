@@ -24,10 +24,10 @@
     <ClCompile Include="Warehouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WorkerRobotSystem.cpp">
+    <ClCompile Include="TaskDistributer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TaskDistributer.cpp">
+    <ClCompile Include="RobotController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,10 +38,10 @@
     <ClInclude Include="Warehouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WorkerRobotSystem.h">
+    <ClInclude Include="TaskDistributer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TaskDistributer.h">
+    <ClInclude Include="RobotController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

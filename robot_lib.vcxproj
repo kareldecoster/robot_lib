@@ -133,13 +133,13 @@
     <ClCompile Include="TaskDistributer.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Warehouse.cpp" />
-    <ClCompile Include="WorkerRobotSystem.cpp" />
+    <ClCompile Include="RobotController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TaskDistributer.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Warehouse.h" />
-    <ClInclude Include="WorkerRobotSystem.h" />
+    <ClInclude Include="RobotController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

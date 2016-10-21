@@ -1,12 +1,12 @@
-#include "WorkerRobotSystem.h"
+#include "RobotController.h"
 
-WorkerRobotSystem::WorkerRobotSystem(Warehouse& wh, Point& location, int containerVolume) : wh(wh), position(location) {
+RobotController::RobotController(Warehouse& wh, Point& location, int containerVolume) : wh(wh), position(location) {
 	this->containerVolume = containerVolume;
 	done = 0;
-	robot_thread = new thread(&WorkerRobotSystem::loop, this);
+	robot_thread = new thread(&RobotController::loop, this);
 }
 
-void WorkerRobotSystem::loop() {
+void RobotController::loop() {
 	while (!done) {
 		while (!articlesToBePicked.empty()) {
 
@@ -36,7 +36,7 @@ void WorkerRobotSystem::loop() {
 	}
 }
 
-vector<int> WorkerRobotSystem:: find_best_route(vector<int> route) {
+vector<int> RobotController:: find_best_route(vector<int> route) {
 	int size = route.size();
 	int best_path = INT_MAX;
 	vector<int>best_route;
@@ -66,29 +66,29 @@ vector<int> WorkerRobotSystem:: find_best_route(vector<int> route) {
 }
 
 
-void WorkerRobotSystem::addArticlesToBePicked(queue<int> articles) {
+void RobotController::addArticlesToBePicked(queue<int> articles) {
 	while (!articles.empty()) {
 		this->articlesToBePicked.push(articles.front());
 		articles.pop();
 	}
 }
 
-bool WorkerRobotSystem::isDone() {
+bool RobotController::isDone() {
 	return this->articlesToBePicked.empty();
 }
 
-const Warehouse& WorkerRobotSystem::getWarehouse() const {
+const Warehouse& RobotController::getWarehouse() const {
 	return wh;
 }
 
-WorkerRobotSystem::~WorkerRobotSystem() {
+RobotController::~RobotController() {
 	done = 1;
 	robot_thread->join();
 	delete robot_thread;
 	robot_thread = NULL;
 }
 
-void WorkerRobotSystem::moveTo(Point dest) {
+void RobotController::moveTo(Point dest) {
 	if (position.getX() > dest.getX()) {
 		move(LEFT, position.getX() - dest.getX());
 	}
@@ -104,7 +104,7 @@ void WorkerRobotSystem::moveTo(Point dest) {
 	position = dest;
 }
 
-void WorkerRobotSystem::move(direction dir, int distance) {
+void RobotController::move(direction dir, int distance) {
 	ofstream myfile;
 	myfile.open("output.txt", std::ofstream::out | std::ofstream::app);
 	switch (dir) {

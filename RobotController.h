@@ -1,5 +1,5 @@
-#ifndef WORKERROBOTSYSTEM_H_
-#define WORKERROBOTSYSTEM_H_
+#ifndef ROBOTCONTROLLER_H_
+#define ROBOTCONTROLLER_H_
 
 #include "Warehouse.h"
 #include "Point.h"
@@ -12,10 +12,10 @@ using namespace std;
 
 enum direction { UP, DOWN, LEFT, RIGHT };
 
-class WorkerRobotSystem {
+class RobotController {
 public:
-	WorkerRobotSystem(Warehouse& wh, Point& location, int containerVolume);
-	virtual ~WorkerRobotSystem();
+	RobotController(Warehouse& wh, Point& location, int containerVolume);
+	virtual ~RobotController();
 	void addArticlesToBePicked(queue<int> articles);
 	bool isDone(void);
 	const Warehouse& getWarehouse() const;
@@ -30,7 +30,7 @@ private:
 	void loop();
 	void moveTo(Point dest);
 	void move(direction dir, int distance);
-	vector<int> WorkerRobotSystem::find_best_route(vector<int> pickingQ);
+	vector<int> RobotController::find_best_route(vector<int> pickingQ);
 };
 
-#endif /* WORKERROBOTSYSTEM_H_ */
+#endif /* ROBOTCONTROLLER_H_ */
