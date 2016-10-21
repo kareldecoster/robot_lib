@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef MANAGERROBOT_H_
-#define MANAGERROBOT_H_
+#ifndef TASKDISTRIBUTER_H_
+#define TASKDISTRIBUTER_H_
 
 #include <list>
 #include "Warehouse.h"
@@ -12,17 +12,17 @@
 
 using namespace std;
 
-class ManagerRobot {
+class TaskDistributer {
 	list<Warehouse> warehouses;
 
 public:
-	ManagerRobot();
+	TaskDistributer();
 	void addWarehouse(Warehouse wh);
 	void removeWarehouse(Warehouse wh);
 	void removeWarehouse(int warehouseId);
 	void print();
-	virtual ~ManagerRobot();
+	virtual ~TaskDistributer();
 };
 
-#endif /* MANAGERROBOT_H_ */
+#endif /* TASKDISTRIBUTER_H_ */
 
