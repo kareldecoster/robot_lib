@@ -3,6 +3,9 @@
 #define POINT_H_
 
 #include <cstdlib>
+#include <algorithm>
+
+using namespace std;
 
 class Point {
 	int x, y;

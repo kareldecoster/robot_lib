@@ -16,5 +16,5 @@ Point::~Point() {
 
 int Point::distanceTo(Point dest)
 {
-	return (abs(this->getX() - dest.getX()) + abs(this->getY() - dest.getY())) ;
+	return (max(abs(this->getX() - dest.getX()),abs(this->getY() - dest.getY()))) ;
 }

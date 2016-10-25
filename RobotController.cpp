@@ -1,42 +1,62 @@
 #include "RobotController.h"
 
-RobotController::RobotController(Warehouse& wh, Point& location, int containerVolume) : wh(wh), position(location) {
+RobotController::RobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate) : wh(wh), position(location) {
 	this->containerVolume = containerVolume;
 	readerDone = 0;
+	this->cport_nr = cport_nr;
+	this->bdrate = bdrate;
+	//Initialize everything before starting the new thread.
 	reader = new thread(&RobotController::readerLoop, this);
 }
 
 void RobotController::readerLoop() {
+	char mode[] = { '8','N','1',0 };
+
+	if (RS232_OpenComport(this->cport_nr, this->bdrate, mode))
+	{
+		printf("Can not open comport\n");
+
+		return;
+	}
+
 	while (!readerDone) {
-		while (!articlesToBePicked.empty()) {
+		while (!itemsToBePicked.empty()) {
 
-			vector<int> pickListForThisRun;
+			vector<Item> pickListForThisRun;
 			int plannedVolume = 0;
-			//TODO add size to articles..
-			while (plannedVolume + 1 <= containerVolume && !articlesToBePicked.empty()) {
-				pickListForThisRun.push_back(articlesToBePicked.front());
-
-				articlesToBePicked.pop();
-				plannedVolume += 1;
+			
+			//plan which items you can pick this run, taking the size into consideration.
+			while (!itemsToBePicked.empty() && plannedVolume + itemsToBePicked.front().getSize() <= containerVolume) {
+				pickListForThisRun.push_back(itemsToBePicked.front());
+				plannedVolume += itemsToBePicked.front().getSize();
+				itemsToBePicked.pop();
 			}
-			vector<int> route = findBestRoute(pickListForThisRun);
+
+			//Find the optimal route to pick all the items of this run.
+			vector<Item> route = findBestRoute(pickListForThisRun);
 			
 			//Pick the items of this route
 			while (!route.empty()) {
-				moveTo(wh.getPositionOfStorageUnit(route.back()));
+				moveTo(wh.getPositionOfStorageUnit(route.back().getStorageUnit()));
 				//pick
+				send_check('P');
 				route.pop_back();
 			}
+
+			//Move to the drop-off zone and drop the items.
 			moveTo(wh.getCollectionPoint());
-			//TODO drop items
+			//drop
+			send_check('Q');
 		}
 	}
+	RS232_CloseComport(cport_nr);
 }
 
 vector<int> RobotController:: findBestRoute(vector<int> route) {
 	int size = route.size();
 	int best_path = INT_MAX;
 	vector<int>best_route;
+	sort(route.begin(), route.end());	//first sort to get all possible permutations.
 	do {
 		int curr_path = 0;
 
@@ -65,25 +85,69 @@ vector<int> RobotController:: findBestRoute(vector<int> route) {
 	return best_route;
 }
 
+vector<Item> RobotController::findBestRoute(vector<Item> route) {
+	int size = route.size();
+	int best_path = INT_MAX;
+	vector<Item>best_route;
+	sort(route.begin(), route.end());	//first sort to get all possible permutations.
+	do {
+		int curr_path = 0;
 
-void RobotController::addItemsToBePicked(queue<Item> itemsToPick) {
+		//Add distance from start to first item
+		curr_path += wh.getPositionOfStorageUnit(route.at(0).getStorageUnit())
+			.distanceTo(wh.getCollectionPoint());
+
+		for (int i = 0; i < size; i++) {
+
+			if (i > 0) {
+				curr_path += wh.getPositionOfStorageUnit(route.at(i).getStorageUnit())
+					.distanceTo(wh.getPositionOfStorageUnit(route.at(i - 1).getStorageUnit()));
+			}
+		}
+
+		//Add distance from last item to drop off
+		curr_path += wh.getPositionOfStorageUnit(route.at(size - 1).getStorageUnit())
+			.distanceTo(wh.getCollectionPoint());
+
+		if (curr_path < best_path) {
+			best_path = curr_path;
+			best_route = route;
+		}
+	} while (std::next_permutation(route.begin(), route.end()));
+
+	return best_route;
+}
+
+
+
+void RobotController::addItemsToPick(queue<Item> itemsToPick) {
 	while (!itemsToPick.empty()) {
-		this->articlesToBePicked.push(itemsToPick.front().getStorageUnit());
+		addItemToPick(itemsToPick.front());
 		itemsToPick.pop();
 	}
 }
 
 void RobotController::addItemToPick(Item item)
 {
-	this->articlesToBePicked.push(item.getStorageUnit());
+	this->itemsToBePicked.push(item);
 }
 
 bool RobotController::isDone() {
-	return this->articlesToBePicked.empty();
+	return this->itemsToBePicked.empty();
+}
+
+const Point & RobotController::getPosition()
+{
+	return position;
 }
 
 const Warehouse& RobotController::getWarehouse() const {
 	return wh;
+}
+
+const int RobotController::getContainerVolume()
+{
+	return this->containerVolume;
 }
 
 RobotController::~RobotController() {
@@ -110,23 +174,39 @@ void RobotController::moveTo(Point dest) {
 }
 
 void RobotController::move(direction dir, int distance) {
-	ofstream myfile;
-	myfile.open("output.txt", std::ofstream::out | std::ofstream::app);
-	switch (dir) {
-	case LEFT:
-		myfile << distance << "L\n";
-		break;
-	case RIGHT:
-		myfile << distance << "R\n";
-		break;
-	case DOWN:
-		myfile << distance << "D\n";
-		break;
-	case UP:
-		myfile << distance << "U\n";
-		break;
-	default:
-		break;
-		myfile.close();
+	for (int i = 0; i < distance; i++) {
+		switch (dir) {
+		case LEFT:
+			send_check('L');
+			break;
+		case RIGHT:
+			send_check('R');
+			break;
+		case DOWN:
+			send_check('D');
+			break;
+		case UP:
+			send_check('U');
+			break;
+		default:
+			break;
+		}
 	}
+}
+
+bool RobotController::send_check(char toSend)
+{
+	unsigned char buf;
+	RS232_cputs(cport_nr, &toSend);
+	std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	volatile int n = RS232_PollComport(cport_nr, &buf, 1);
+	while (n < 1) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		n = RS232_PollComport(cport_nr, &buf, 1);
+	}
+	if (buf == toSend) {
+		return true;
+	}
+	//TODO: log error
+	return false;
 }

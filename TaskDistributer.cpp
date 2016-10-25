@@ -28,16 +28,16 @@ void TaskDistributer::print() {
 	cout << warehouses.size() << endl;
 }
 
-void TaskDistributer::addRobotController(RobotController robot)
+void TaskDistributer::addRobotController(RobotController* robot)
 {
 	this->robots.push_back(robot);
 }
 
 void TaskDistributer::removeRobotController(RobotController robot)
 {	
-	for (std::list<RobotController>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
+	for (std::list<RobotController*>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
 	{
-		if (i->getWarehouse().getWarehouseId() == robot.getWarehouse().getWarehouseId())
+		if ((*i)->getWarehouse().getWarehouseId() == robot.getWarehouse().getWarehouseId())
 			i = this->robots.erase(i);
 		else
 			++i;
@@ -51,23 +51,25 @@ TaskDistributer::~TaskDistributer() {
 void TaskDistributer::giveOrdersToRobotControllers(queue<Item> orders)
 {
 	while (!orders.empty()) {
-		Item* tmp = &(orders.front());
-		if (getRobotByWarehouse(*(tmp->getWarehouse())) != nullptr) {
-			getRobotByWarehouse(*(tmp->getWarehouse()))->addItemToPick(*tmp);
+		Item tmp = (orders.front());
+		if (getRobotByWarehouse(*(tmp.getWarehouse())) != nullptr) {
+			getRobotByWarehouse(*(tmp.getWarehouse()))->addItemToPick(tmp);
 		}
 		else {
 			//TODO: write log
 		}
+		orders.pop();
 	}
 }
 
 RobotController * TaskDistributer::getRobotByWarehouse(Warehouse wh)
 {
-	for each (RobotController robot in robots)
+	for (std::list<RobotController*>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
 	{
-		if (robot.getWarehouse().getWarehouseId() == wh.getWarehouseId()) {
-			return &robot;
-		}
+		if ((*i)->getWarehouse().getWarehouseId() == wh.getWarehouseId())
+			return &**i;
+		else
+			++i;
 	}
 	return nullptr;
 }
