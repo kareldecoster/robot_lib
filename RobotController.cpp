@@ -5,13 +5,13 @@ RobotController::RobotController(Warehouse& wh, Point& location, int containerVo
 	readerDone = 0;
 	this->cport_nr = cport_nr;
 	this->bdrate = bdrate;
+
 	//Initialize everything before starting the new thread.
-	reader = new thread(&RobotController::readerLoop, this);
+	reader = new boost::thread(&RobotController::readerLoop, this);
 }
 
 void RobotController::readerLoop() {
 	char mode[] = { '8','N','1',0 };
-
 	if (RS232_OpenComport(this->cport_nr, this->bdrate, mode))
 	{
 		printf("Can not open comport\n");
@@ -20,33 +20,41 @@ void RobotController::readerLoop() {
 	}
 
 	while (!readerDone) {
+		Item* curr;
+		vector<Item> pickListForThisRun;
+		int plannedVolume = 0;
 		while (!itemsToBePicked.empty()) {
-
-			vector<Item> pickListForThisRun;
-			int plannedVolume = 0;
-			
-			//plan which items you can pick this run, taking the size into consideration.
-			while (!itemsToBePicked.empty() && plannedVolume + itemsToBePicked.front().getSize() <= containerVolume) {
-				pickListForThisRun.push_back(itemsToBePicked.front());
-				plannedVolume += itemsToBePicked.front().getSize();
-				itemsToBePicked.pop();
+			this->itemsToBePicked.pop(curr);
+			//if there is room 
+			if (curr->getSize() + plannedVolume <= containerVolume) {
+				//Add it to the picklist for this run
+				pickListForThisRun.push_back(*curr);
+				plannedVolume += curr->getSize();
+				delete curr;
 			}
+			else {
+				//Collect the items
+				//Find the optimal route to pick all the items of this run.
+				vector<Item> route = findBestRoute(pickListForThisRun);
 
-			//Find the optimal route to pick all the items of this run.
-			vector<Item> route = findBestRoute(pickListForThisRun);
-			
-			//Pick the items of this route
-			while (!route.empty()) {
-				moveTo(wh.getPositionOfStorageUnit(route.back().getStorageUnit()));
-				//pick
-				send_check('P');
-				route.pop_back();
-			}
+				//Pick the items of this route
+				while (!route.empty()) {
+					moveTo(wh.getPositionOfStorageUnit(route.back().getStorageUnit()));
+					//pick
+					send_check('P');
+					route.pop_back();
+				}
 
-			//Move to the drop-off zone and drop the items.
-			moveTo(wh.getCollectionPoint());
-			//drop
-			send_check('Q');
+				//Move to the drop-off zone and drop the items.
+				moveTo(wh.getCollectionPoint());
+				//drop
+				send_check('Q');
+				pickListForThisRun.clear();
+				//Add the item to the list for the next run
+				plannedVolume = curr->getSize();
+				pickListForThisRun.push_back(*curr);
+				//delete curr;
+			}		
 		}
 	}
 	RS232_CloseComport(cport_nr);
@@ -122,14 +130,14 @@ vector<Item> RobotController::findBestRoute(vector<Item> route) {
 
 void RobotController::addItemsToPick(queue<Item> itemsToPick) {
 	while (!itemsToPick.empty()) {
-		addItemToPick(itemsToPick.front());
+		addItemToPick(&(itemsToPick.front()));
 		itemsToPick.pop();
 	}
 }
 
-void RobotController::addItemToPick(Item item)
+void RobotController::addItemToPick(Item* item)
 {
-	this->itemsToBePicked.push(item);
+	while(!this->itemsToBePicked.push(item));
 }
 
 bool RobotController::isDone() {
@@ -198,10 +206,10 @@ bool RobotController::send_check(char toSend)
 {
 	unsigned char buf;
 	RS232_cputs(cport_nr, &toSend);
-	std::this_thread::sleep_for(std::chrono::milliseconds(5));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	volatile int n = RS232_PollComport(cport_nr, &buf, 1);
 	while (n < 1) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 		n = RS232_PollComport(cport_nr, &buf, 1);
 	}
 	if (buf == toSend) {

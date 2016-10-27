@@ -15,6 +15,10 @@ Item::Item(Warehouse * wh, int size, int storageUnit, int orderID, string barcod
 	this->barcode = barcode;
 }
 
+Item::Item(const Item & orig) : warehouse(orig.getWarehouse()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), barcode(orig.getBarcode())
+{
+}
+
 
 Item::~Item()
 {

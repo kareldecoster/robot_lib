@@ -33,7 +33,7 @@ void TaskDistributer::addRobotController(RobotController* robot)
 	this->robots.push_back(robot);
 }
 
-void TaskDistributer::removeRobotController(RobotController robot)
+void TaskDistributer::removeRobotController(RobotController& robot)
 {	
 	for (std::list<RobotController*>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
 	{
@@ -48,12 +48,12 @@ TaskDistributer::~TaskDistributer() {
 	// TODO Auto-generated destructor stub
 }
 
-void TaskDistributer::giveOrdersToRobotControllers(queue<Item> orders)
+void TaskDistributer::giveOrdersToRobotControllers(queue<Item*> orders)
 {
 	while (!orders.empty()) {
-		Item tmp = (orders.front());
-		if (getRobotByWarehouse(*(tmp.getWarehouse())) != nullptr) {
-			getRobotByWarehouse(*(tmp.getWarehouse()))->addItemToPick(tmp);
+		Item* tmp = orders.front();
+		if (getRobotByWarehouse(*(tmp->getWarehouse())) != nullptr) {
+			getRobotByWarehouse(*(tmp->getWarehouse()))->addItemToPick(tmp);
 		}
 		else {
 			//TODO: write log

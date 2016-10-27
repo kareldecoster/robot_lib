@@ -12,6 +12,7 @@ class Item
 public:
 	Item();
 	Item(Warehouse* wh, int size, int storageUnit, int orderID, string barcode);
+	Item(const Item& orig);
 	~Item();
 	Warehouse* getWarehouse() const;
 	void setWarehouse(Warehouse* wh);

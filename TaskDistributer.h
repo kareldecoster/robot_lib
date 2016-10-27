@@ -23,8 +23,8 @@ public:
 	void removeWarehouse(int warehouseId);
 	void print();
 	void addRobotController(RobotController* robot);
-	void removeRobotController(RobotController robot);
-	void giveOrdersToRobotControllers(queue<Item> orders);
+	void removeRobotController(RobotController& robot);
+	void giveOrdersToRobotControllers(queue<Item*> orders);
 	virtual ~TaskDistributer();
 private:
 	list<Warehouse> warehouses;

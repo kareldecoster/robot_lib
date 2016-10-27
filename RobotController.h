@@ -6,7 +6,10 @@
 #include "Item.h"
 #include <iostream>
 #include <queue>
-#include <thread>
+
+#include<boost/lockfree/queue.hpp>
+#include<boost/atomic.hpp>
+#include<boost/thread/thread.hpp>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -28,17 +31,17 @@ public:
 	RobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate);
 	virtual ~RobotController();
 	void addItemsToPick(queue<Item> itemsToPick);
-	void addItemToPick(Item item);
+	void addItemToPick(Item* item);
 	bool isDone(void);
 	const Point& getPosition();
 	const Warehouse& getWarehouse() const;
 	const int getContainerVolume();
 private:
 	Warehouse wh;
-	queue<Item> itemsToBePicked;
+	boost::lockfree::queue<Item*> itemsToBePicked{ 1024 };
 	Point position;
 	int containerVolume;
-	thread* reader;
+	boost::thread* reader;
 	volatile int readerDone;
 	int cport_nr, bdrate;
 
