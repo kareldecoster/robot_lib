@@ -19,17 +19,19 @@ using namespace std;
 class TaskDistributer {
 public:
 	TaskDistributer();
+	void print();
+	void setup(string filePath);
+	bool areAllRobotsDone();
+	void giveOrdersToRobotControllers(queue<Item*> orders);
+	virtual ~TaskDistributer();
+
+	// Make private..?
+	void addRobotController(RobotController* robot);
+	void removeRobotController(RobotController& robot);
 	void addWarehouse(Warehouse wh);
 	Warehouse getWarehouse(int id);
 	void removeWarehouse(Warehouse wh);
 	void removeWarehouse(int warehouseId);
-	void print();
-	void addRobotController(RobotController* robot);
-	void removeRobotController(RobotController& robot);
-	void giveOrdersToRobotControllers(queue<Item*> orders);
-	void setup(string filePath);
-	bool areAllRobotsDone();
-	virtual ~TaskDistributer();
 private:
 	list<Warehouse> warehouses;
 	list<RobotController*> robots;

@@ -98,12 +98,11 @@ void TaskDistributer::setup(string filePath)
 
 bool TaskDistributer::areAllRobotsDone()
 {
+	bool done = true;
 	for (auto& robot : robots) {
-		if (!robot->isDone()) {
-			return false;
-		}
+		done &= robot->isDone();
 	}
-	return true;
+	return done;
 }
 
 RobotController * TaskDistributer::getRobotByWarehouse(const Warehouse* wh)
