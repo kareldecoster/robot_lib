@@ -42,16 +42,17 @@ private:
 	Point position;
 	int containerVolume;
 	boost::thread* reader;
-	volatile int readerDone;
+	volatile boost::atomic_int readerDone;
 	int cport_nr, bdrate;
 
 
 	void readerLoop();
 	void moveTo(Point dest);
 	void move(direction dir, int distance);
-	vector<int> findBestRoute(vector<int> subOptimalRouteOfStorageUnits);
+	int calculateLengthOfRoute(vector<Item>route);
 	vector<Item> findBestRoute(vector<Item> subOptimalRouteOfStorageUnits);
-	bool send_check(char toSend);
+	void executeRun(vector<Item> route);
+	bool sendAndCheck(char toSend);
 
 };
 

@@ -14,7 +14,7 @@ void RobotController::readerLoop() {
 	char mode[] = { '8','N','1',0 };
 	if (RS232_OpenComport(this->cport_nr, this->bdrate, mode))
 	{
-		printf("Can not open comport\n");
+		printf("Can not open comport %d\n", this->cport_nr);
 
 		return;
 	}
@@ -23,107 +23,90 @@ void RobotController::readerLoop() {
 		Item* curr;
 		vector<Item> pickListForThisRun;
 		int plannedVolume = 0;
-		while (!itemsToBePicked.empty()) {
-			this->itemsToBePicked.pop(curr);
-			//if there is room 
+		while (this->itemsToBePicked.pop(curr)) {
+
 			if (curr->getSize() + plannedVolume <= containerVolume) {
 				//Add it to the picklist for this run
 				pickListForThisRun.push_back(*curr);
 				plannedVolume += curr->getSize();
 				delete curr;
 			}
-			else {
-				//Collect the items
+			else{
 				//Find the optimal route to pick all the items of this run.
 				vector<Item> route = findBestRoute(pickListForThisRun);
 
-				//Pick the items of this route
-				while (!route.empty()) {
-					moveTo(wh.getPositionOfStorageUnit(route.back().getStorageUnit()));
-					//pick
-					send_check('P');
-					route.pop_back();
-				}
+				//Collect items and drop them off.
+				executeRun(route);
 
-				//Move to the drop-off zone and drop the items.
-				moveTo(wh.getCollectionPoint());
-				//drop
-				send_check('Q');
-				pickListForThisRun.clear();
 				//Add the item to the list for the next run
+				pickListForThisRun.clear();
 				plannedVolume = curr->getSize();
 				pickListForThisRun.push_back(*curr);
-				//delete curr;
-			}		
+			}
+			if (this->itemsToBePicked.empty()) {
+				//Find the optimal route to pick all the items of this run.
+				vector<Item> route = findBestRoute(pickListForThisRun);
+
+				//Collect items and drop them off.
+				executeRun(route);
+			}
+
 		}
 	}
 	RS232_CloseComport(cport_nr);
 }
 
-vector<int> RobotController:: findBestRoute(vector<int> route) {
+int RobotController::calculateLengthOfRoute(vector<Item>route) {
+	int currRouteLength = 0;
 	int size = route.size();
-	int best_path = INT_MAX;
-	vector<int>best_route;
-	sort(route.begin(), route.end());	//first sort to get all possible permutations.
-	do {
-		int curr_path = 0;
 
-		//Add distance from start to first item
-		curr_path += wh.getPositionOfStorageUnit(route.at(0))
-			.distanceTo(wh.getCollectionPoint());
+	//Add distance from start to first item
+	currRouteLength += wh.getPositionOfStorageUnit(route.at(0).getStorageUnit())
+		.distanceTo(wh.getCollectionPoint());
 
-		for (int i = 0; i < size; i++) {
+	for (int i = 0; i < size; i++) {
 
-			if (i > 0) {
-				curr_path += wh.getPositionOfStorageUnit(route.at(i))
-					.distanceTo(wh.getPositionOfStorageUnit(route.at(i-1)));
-			}
+		if (i > 0) {
+			currRouteLength += wh.getPositionOfStorageUnit(route.at(i).getStorageUnit())
+				.distanceTo(wh.getPositionOfStorageUnit(route.at(i - 1).getStorageUnit()));
 		}
+	}
 
-		//Add distance from last item to drop off
-		curr_path += wh.getPositionOfStorageUnit(route.at(size-1))
-			.distanceTo(wh.getCollectionPoint());
-
-		if (curr_path < best_path) {
-			best_path = curr_path;
-			best_route = route;
-		}
-	} while (std::next_permutation(route.begin(), route.end()));
-		
-	return best_route;
+	//Add distance from last item to drop off
+	currRouteLength += wh.getPositionOfStorageUnit(route.at(size - 1).getStorageUnit())
+		.distanceTo(wh.getCollectionPoint());
+	return currRouteLength;
 }
 
 vector<Item> RobotController::findBestRoute(vector<Item> route) {
-	int size = route.size();
-	int best_path = INT_MAX;
-	vector<Item>best_route;
-	sort(route.begin(), route.end());	//first sort to get all possible permutations.
+	int bestRouteLength = INT_MAX;
+	vector<Item>bestRoute;
+	//first sort to get all possible permutations.
+	sort(route.begin(), route.end());
 	do {
-		int curr_path = 0;
+		int currRouteLength = calculateLengthOfRoute(route);
 
-		//Add distance from start to first item
-		curr_path += wh.getPositionOfStorageUnit(route.at(0).getStorageUnit())
-			.distanceTo(wh.getCollectionPoint());
-
-		for (int i = 0; i < size; i++) {
-
-			if (i > 0) {
-				curr_path += wh.getPositionOfStorageUnit(route.at(i).getStorageUnit())
-					.distanceTo(wh.getPositionOfStorageUnit(route.at(i - 1).getStorageUnit()));
-			}
-		}
-
-		//Add distance from last item to drop off
-		curr_path += wh.getPositionOfStorageUnit(route.at(size - 1).getStorageUnit())
-			.distanceTo(wh.getCollectionPoint());
-
-		if (curr_path < best_path) {
-			best_path = curr_path;
-			best_route = route;
+		if (currRouteLength < bestRouteLength) {
+			bestRouteLength = currRouteLength;
+			bestRoute = route;
 		}
 	} while (std::next_permutation(route.begin(), route.end()));
 
-	return best_route;
+	return bestRoute;
+}
+
+void RobotController::executeRun(vector<Item> route)
+{
+	//Pick the items of this route
+	while (!route.empty()) {
+		moveTo(wh.getPositionOfStorageUnit(route.back().getStorageUnit()));
+		sendAndCheck('P');
+		route.pop_back();
+	}
+
+	//Move to the drop-off zone and drop the items.
+	moveTo(wh.getCollectionPoint());
+	sendAndCheck('Q');
 }
 
 
@@ -137,6 +120,7 @@ void RobotController::addItemsToPick(queue<Item> itemsToPick) {
 
 void RobotController::addItemToPick(Item* item)
 {
+	//Keeps running until the item is added successfully.
 	while(!this->itemsToBePicked.push(item));
 }
 
@@ -185,16 +169,16 @@ void RobotController::move(direction dir, int distance) {
 	for (int i = 0; i < distance; i++) {
 		switch (dir) {
 		case LEFT:
-			send_check('L');
+			sendAndCheck('L');
 			break;
 		case RIGHT:
-			send_check('R');
+			sendAndCheck('R');
 			break;
 		case DOWN:
-			send_check('D');
+			sendAndCheck('D');
 			break;
 		case UP:
-			send_check('U');
+			sendAndCheck('U');
 			break;
 		default:
 			break;
@@ -202,7 +186,7 @@ void RobotController::move(direction dir, int distance) {
 	}
 }
 
-bool RobotController::send_check(char toSend)
+bool RobotController::sendAndCheck(char toSend)
 {
 	unsigned char buf;
 	RS232_cputs(cport_nr, &toSend);
