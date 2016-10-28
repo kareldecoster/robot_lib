@@ -29,6 +29,7 @@ enum direction { UP, DOWN, LEFT, RIGHT };
 class RobotController {
 public:
 	RobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate);
+	RobotController(RobotController& orig);
 	virtual ~RobotController();
 	void addItemsToPick(queue<Item> itemsToPick);
 	void addItemToPick(Item* item);

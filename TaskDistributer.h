@@ -30,7 +30,7 @@ private:
 	list<Warehouse> warehouses;
 	list<RobotController*> robots;
 
-	RobotController* getRobotByWarehouse(Warehouse wh);
+	RobotController* getRobotByWarehouse(const Warehouse* wh);
 };
 
 #endif /* TASKDISTRIBUTER_H_ */

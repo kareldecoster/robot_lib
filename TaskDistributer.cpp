@@ -62,11 +62,11 @@ void TaskDistributer::giveOrdersToRobotControllers(queue<Item*> orders)
 	}
 }
 
-RobotController * TaskDistributer::getRobotByWarehouse(Warehouse wh)
+RobotController * TaskDistributer::getRobotByWarehouse(const Warehouse* wh)
 {
 	for (std::list<RobotController*>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
 	{
-		if ((*i)->getWarehouse().getWarehouseId() == wh.getWarehouseId())
+		if ((*i)->getWarehouse().getWarehouseId() == wh->getWarehouseId())
 			return &**i;
 		else
 			++i;

@@ -6,13 +6,12 @@ Item::Item()
 {
 }
 
-Item::Item(Warehouse * wh, int size, int storageUnit, int orderID, string barcode)
+Item::Item(Warehouse * wh, int size, int storageUnit, int orderID, string barcode) : this->barcode(barcode)
 {
 	this->warehouse = wh;
 	this->size = size;
 	this->storageUnit = storageUnit;
 	this->orderID = orderID;
-	this->barcode = barcode;
 }
 
 Item::Item(const Item & orig) : warehouse(orig.getWarehouse()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), barcode(orig.getBarcode())

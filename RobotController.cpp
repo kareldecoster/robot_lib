@@ -10,6 +10,11 @@ RobotController::RobotController(Warehouse& wh, Point& location, int containerVo
 	reader = new boost::thread(&RobotController::readerLoop, this);
 }
 
+RobotController::RobotController(RobotController & orig) : wh(orig.wh), position(orig.position), containerVolume(orig.containerVolume), cport_nr(orig.cport_nr), bdrate(orig.bdrate), readerDone(orig.readerDone)
+{
+	reader = new boost::thread(&RobotController::readerLoop, this);
+}
+
 void RobotController::readerLoop() {
 	char mode[] = { '8','N','1',0 };
 	if (RS232_OpenComport(this->cport_nr, this->bdrate, mode))
