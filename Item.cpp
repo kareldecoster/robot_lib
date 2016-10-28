@@ -6,15 +6,15 @@ Item::Item()
 {
 }
 
-Item::Item(Warehouse * wh, int size, int storageUnit, int orderID, string barcode) : this->barcode(barcode)
+Item::Item(const int warehouseID, const int size, const int storageUnit, const int orderID, const string& barcode) : barcode(barcode)
 {
-	this->warehouse = wh;
+	this->warehouseID = warehouseID;
 	this->size = size;
 	this->storageUnit = storageUnit;
 	this->orderID = orderID;
 }
 
-Item::Item(const Item & orig) : warehouse(orig.getWarehouse()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), barcode(orig.getBarcode())
+Item::Item(const Item & orig) : warehouseID(orig.getWarehouseID()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), barcode(orig.getBarcode())
 {
 }
 
@@ -23,14 +23,14 @@ Item::~Item()
 {
 }
 
-Warehouse * Item::getWarehouse() const
+int Item::getWarehouseID() const
 {
-	return this->warehouse;
+	return this->warehouseID;
 }
 
-void Item::setWarehouse(Warehouse * wh)
+void Item::setWarehouseID(int whid)
 {
-	this->warehouse = wh;
+	this->warehouseID = whid;
 }
 
 int Item::getSize() const

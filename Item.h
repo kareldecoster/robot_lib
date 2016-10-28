@@ -11,11 +11,11 @@ class Item
 {
 public:
 	Item();
-	Item(Warehouse* wh, int size, int storageUnit, int orderID, string barcode);
+	Item(const int warehouseID, const int size, const int storageUnit, const int orderID, const string& barcode);
 	Item(const Item& orig);
 	~Item();
-	Warehouse* getWarehouse() const;
-	void setWarehouse(Warehouse* wh);
+	int getWarehouseID() const;
+	void setWarehouseID(int warehouseID);
 	int getSize() const;
 	void setSize(int size);
 	int getStorageUnit() const;
@@ -26,7 +26,7 @@ public:
 	void setBarcode(string barcode);
 
 private:
-	Warehouse* warehouse;
+	int warehouseID;
 	int size;
 	int storageUnit;
 	int orderID;
@@ -35,8 +35,8 @@ private:
 
 inline bool operator< (const Item& lhs, const Item& rhs) { 
 	// First order by warehouseID, them by storage unit.
-	if (lhs.getWarehouse()->getWarehouseId() != rhs.getWarehouse()->getWarehouseId()) {
-		return lhs.getWarehouse()->getWarehouseId() < rhs.getWarehouse()->getWarehouseId();
+	if (lhs.getWarehouseID() != rhs.getWarehouseID()) {
+		return lhs.getWarehouseID() < rhs.getWarehouseID();
 	}
 	return lhs.getStorageUnit() < rhs.getStorageUnit(); 
 }

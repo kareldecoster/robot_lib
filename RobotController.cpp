@@ -28,34 +28,36 @@ void RobotController::readerLoop() {
 		Item* curr;
 		vector<Item> pickListForThisRun;
 		int plannedVolume = 0;
-		while (this->itemsToBePicked.pop(curr)) {
+		while (!this->itemsToBePicked.empty()) {
+			while (this->itemsToBePicked.pop(curr)) {
 
-			if (curr->getSize() + plannedVolume <= containerVolume) {
-				//Add it to the picklist for this run
-				pickListForThisRun.push_back(*curr);
-				plannedVolume += curr->getSize();
-				delete curr;
+				if (curr->getSize() + plannedVolume <= containerVolume) {
+					//Add it to the picklist for this run
+					pickListForThisRun.push_back(*curr);
+					plannedVolume += curr->getSize();
+					delete curr;
+				}
+				else {
+					//Find the optimal route to pick all the items of this run.
+					vector<Item> route = findBestRoute(pickListForThisRun);
+
+					//Collect items and drop them off.
+					executeRun(route);
+
+					//Add the item to the list for the next run
+					pickListForThisRun.clear();
+					plannedVolume = curr->getSize();
+					pickListForThisRun.push_back(*curr);
+				}
+				if (this->itemsToBePicked.empty()) {
+					//Find the optimal route to pick all the items of this run.
+					vector<Item> route = findBestRoute(pickListForThisRun);
+
+					//Collect items and drop them off.
+					executeRun(route);
+				}
+
 			}
-			else{
-				//Find the optimal route to pick all the items of this run.
-				vector<Item> route = findBestRoute(pickListForThisRun);
-
-				//Collect items and drop them off.
-				executeRun(route);
-
-				//Add the item to the list for the next run
-				pickListForThisRun.clear();
-				plannedVolume = curr->getSize();
-				pickListForThisRun.push_back(*curr);
-			}
-			if (this->itemsToBePicked.empty()) {
-				//Find the optimal route to pick all the items of this run.
-				vector<Item> route = findBestRoute(pickListForThisRun);
-
-				//Collect items and drop them off.
-				executeRun(route);
-			}
-
 		}
 	}
 	RS232_CloseComport(cport_nr);
