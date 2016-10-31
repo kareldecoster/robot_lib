@@ -55,7 +55,12 @@ void TaskDistributer::removeRobotController(RobotController& robot)
 }
 
 TaskDistributer::~TaskDistributer() {
-	// TODO Auto-generated destructor stub
+	while (!robots.empty()) {
+		RobotController* rc = robots.front();
+		delete rc;
+		robots.pop_front();
+	}
+	warehouses.clear();
 }
 
 void TaskDistributer::giveOrdersToRobotControllers(queue<Item*> orders)

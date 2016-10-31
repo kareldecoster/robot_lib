@@ -157,6 +157,45 @@ RobotController::~RobotController() {
 }
 
 void RobotController::moveTo(Point dest) {
+	int dx = dest.getX()  - position.getX();
+	int dy = dest.getY() - position.getY();
+	if (dy >= 0 && dx >= 0) {
+		// DOWN_RIGHT + DOWN + RIGHT
+		int com = min(abs(dx),abs(dy));
+		int diff_x = abs(dx) - com;
+		int diff_y = abs(dy) - com;
+		move(DOWN_RIGHT, com);
+		move(DOWN, diff_y);
+		move(RIGHT, diff_x);
+	}
+	if (dy < 0 && dx >= 0) {
+		// UP_RIGHT + UP
+		int com = min(abs(dx), abs(dy));
+		int diff_x = abs(dx) - com;
+		int diff_y = abs(dy) - com;
+		move(UP_RIGHT, com);
+		move(UP, diff_y);
+		move(RIGHT, diff_x);
+	}
+	if (dy >= 0 && dx < 0) {
+		// DOWN_LEFT + LEFT
+		int com = min(abs(dx), abs(dy));
+		int diff_x = abs(dx) - com;
+		int diff_y = abs(dy) - com;
+		move(DOWN_LEFT, com);
+		move(DOWN, diff_y);
+		move(LEFT, diff_x);
+	}
+	if (dy < 0 && dx < 0) {
+		// UP_LEFT
+		int com = min(abs(dx), abs(dy));
+		int diff_x = abs(dx) - com;
+		int diff_y = abs(dy) - com;
+		move(UP_LEFT, com);
+		move(UP, diff_y);
+		move(LEFT, diff_x);
+	}
+	/*
 	if (position.getX() > dest.getX()) {
 		move(LEFT, position.getX() - dest.getX());
 	}
@@ -168,7 +207,7 @@ void RobotController::moveTo(Point dest) {
 	}
 	if (position.getY() < dest.getY()) {
 		move(DOWN, dest.getY() - position.getY());
-	}
+	}*/
 	position = dest;
 }
 
@@ -176,16 +215,25 @@ void RobotController::move(direction dir, int distance) {
 	for (int i = 0; i < distance; i++) {
 		switch (dir) {
 		case LEFT:
-			sendAndCheck('L');
+			sendAndCheck(dir);
 			break;
 		case RIGHT:
-			sendAndCheck('R');
+			sendAndCheck(dir);
 			break;
 		case DOWN:
-			sendAndCheck('D');
+			sendAndCheck(dir);
 			break;
 		case UP:
-			sendAndCheck('U');
+			sendAndCheck(dir);
+			break;
+		case UP_LEFT:
+			sendAndCheck(dir);
+			break;
+		case UP_RIGHT:
+			sendAndCheck(dir);
+			break;
+		case DOWN_LEFT:
+			sendAndCheck(dir);
 			break;
 		default:
 			break;
@@ -206,6 +254,5 @@ bool RobotController::sendAndCheck(char toSend)
 	if (buf == toSend) {
 		return true;
 	}
-	//TODO: log error
 	return false;
 }

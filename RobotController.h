@@ -24,7 +24,7 @@
 
 using namespace std;
 
-enum direction { UP, DOWN, LEFT, RIGHT };
+enum direction { UP = 'U', DOWN = 'D', LEFT = 'L', RIGHT = 'R', UP_LEFT = 'A', UP_RIGHT = 'B', DOWN_LEFT = 'C', DOWN_RIGHT = 'E'};
 
 class RobotController {
 public:
