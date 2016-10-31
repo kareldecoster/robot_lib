@@ -20,7 +20,7 @@ class TaskDistributer {
 public:
 	TaskDistributer();
 	void print();
-	void setup(string filePath);
+	int setup(string filePath);
 	bool areAllRobotsDone();
 	void giveOrdersToRobotControllers(queue<Item*> orders);
 	virtual ~TaskDistributer();

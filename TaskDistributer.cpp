@@ -77,27 +77,29 @@ void TaskDistributer::giveOrdersToRobotControllers(queue<Item*> orders)
 	}
 }
 
-void TaskDistributer::setup(string filePath)
+int TaskDistributer::setup(string filePath)
 {
 	ifstream myfile;
 	myfile.open(filePath);
+	if (!myfile) {
+		return EXIT_FAILURE;
+	}
+
 	while (!myfile.eof()) {
 		int whId, rows, cols, p_x, p_y, containerVolume, com, bdrate;
-		myfile >> whId;
-		myfile >> rows;
-		myfile >> cols;
-		myfile >> p_x;
-		myfile >> p_y;
-		myfile >> containerVolume;
-		myfile >> com;
-		myfile >> bdrate;
+		if (!(myfile >> whId >> rows >> cols >> p_x >> p_y >> containerVolume >> com >> bdrate)) {
+			return EXIT_FAILURE;
+		}
 		
 		Warehouse warehouse(whId, rows, cols, Point(p_x, p_y));
-		RobotController* robot = new RobotController(warehouse, Point(p_x, p_y), containerVolume, com, bdrate);
-		addWarehouse(warehouse);
-		addRobotController(robot);
+		if (find(begin(warehouses), end(warehouses), warehouse) == end(warehouses)) {
+			RobotController* robot = new RobotController(warehouse, Point(p_x, p_y), containerVolume, com, bdrate);
+			addWarehouse(warehouse);
+			addRobotController(robot);
+		}
 	}
 	myfile.close();
+	return EXIT_SUCCESS;
 
 }
 
