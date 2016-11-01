@@ -11,7 +11,7 @@ class Item
 {
 public:
 	Item();
-	Item(const int warehouseID, const int size, const int storageUnit, const int orderID, const string& barcode);
+	Item(const int warehouseID, const int size, const int storageUnit, const int orderID, const int customerID, const int truck, const string& barcode);
 	Item(const Item& orig);
 	~Item();
 	int getWarehouseID() const;
@@ -22,6 +22,10 @@ public:
 	void setStorageUnit(int storageUnit);
 	int getOrderID() const;
 	void setOrderID(int orderID);
+	int getCustomerID() const;
+	void setCustomerID(const int customerID);
+	int getTruck() const;
+	void setTruck(const int truck);
 	string getBarcode() const;
 	void setBarcode(string barcode);
 
@@ -30,6 +34,8 @@ private:
 	int size;
 	int storageUnit;
 	int orderID;
+	int customerID;
+	int truck;
 	string barcode;
 };
 

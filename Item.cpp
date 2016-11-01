@@ -6,15 +6,17 @@ Item::Item()
 {
 }
 
-Item::Item(const int warehouseID, const int size, const int storageUnit, const int orderID, const string& barcode) : barcode(barcode)
+Item::Item(const int warehouseID, const int size, const int storageUnit, const int orderID, const int customerID, const int truck, const string& barcode) : barcode(barcode)
 {
 	this->warehouseID = warehouseID;
 	this->size = size;
 	this->storageUnit = storageUnit;
 	this->orderID = orderID;
+	this->customerID = customerID;
+	this->truck = truck;
 }
 
-Item::Item(const Item & orig) : warehouseID(orig.getWarehouseID()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), barcode(orig.getBarcode())
+Item::Item(const Item & orig) : warehouseID(orig.getWarehouseID()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), customerID(orig.getCustomerID), truck(orig.getTruck()), barcode(orig.getBarcode())
 {
 }
 
@@ -61,6 +63,26 @@ int Item::getOrderID() const
 void Item::setOrderID(int orderID)
 {
 	this->orderID = orderID;
+}
+
+int Item::getCustomerID() const
+{
+	return customerID;
+}
+
+void Item::setCustomerID(const int customerID)
+{
+	this->customerID = customerID;
+}
+
+int Item::getTruck() const
+{
+	return truck;
+}
+
+void Item::setTruck(const int truck)
+{
+	this->truck = truck;
 }
 
 string Item::getBarcode() const

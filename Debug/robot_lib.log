@@ -1,3 +1,8 @@
-﻿  TaskDistributer.cpp
-c:\users\k.de.coster\documents\visual studio 2015\projects\brainrobot\robot_lib\taskdistributer.cpp(25): warning C4715: 'TaskDistributer::getWarehouse': not all control paths return a value
+﻿  Item.cpp
+  Generating Code...
+  Compiling...
+  RobotController.cpp
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  TaskDistributer.cpp
   robot_lib.vcxproj -> C:\Users\k.de.coster\Documents\Visual Studio 2015\Projects\brainRobot\Debug\robot_lib.lib
