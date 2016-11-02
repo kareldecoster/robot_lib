@@ -134,20 +134,22 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CollectRobotController.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="rs232.c" />
     <ClCompile Include="TaskDistributer.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Warehouse.cpp" />
-    <ClCompile Include="RobotController.cpp" />
+    <ClCompile Include="PickRobotController.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CollectRobotController.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="rs232.h" />
     <ClInclude Include="TaskDistributer.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Warehouse.h" />
-    <ClInclude Include="RobotController.h" />
+    <ClInclude Include="PickRobotController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

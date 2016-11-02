@@ -16,7 +16,7 @@ Item::Item(const int warehouseID, const int size, const int storageUnit, const i
 	this->truck = truck;
 }
 
-Item::Item(const Item & orig) : warehouseID(orig.getWarehouseID()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), customerID(orig.getCustomerID), truck(orig.getTruck()), barcode(orig.getBarcode())
+Item::Item(const Item& orig) : warehouseID(orig.getWarehouseID()), size(orig.getSize()), storageUnit(orig.getStorageUnit()), orderID(orig.getOrderID()), customerID(orig.getCustomerID()), truck(orig.getTruck()), barcode(orig.getBarcode())
 {
 }
 
@@ -67,7 +67,7 @@ void Item::setOrderID(int orderID)
 
 int Item::getCustomerID() const
 {
-	return customerID;
+	return this->customerID;
 }
 
 void Item::setCustomerID(const int customerID)
@@ -93,4 +93,9 @@ string Item::getBarcode() const
 void Item::setBarcode(string barcode)
 {
 	this->barcode = barcode;
+}
+
+void Item::print() {
+	const char t = '\t';
+	std::cout <<this->warehouseID << t << this->getStorageUnit() << t << this->getOrderID() << t << this->getCustomerID() << t << this->getTruck() << endl;
 }

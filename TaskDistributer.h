@@ -5,7 +5,8 @@
 
 #include <list>
 #include <queue>
-#include "RobotController.h"
+#include "PickRobotController.h"
+#include "CollectRobotController.h"
 #include "Warehouse.h"
 #include "Point.h"
 #include "Item.h"
@@ -26,17 +27,19 @@ public:
 	virtual ~TaskDistributer();
 
 	// Make private..?
-	void addRobotController(RobotController* robot);
-	void removeRobotController(RobotController& robot);
+	void addPickRobotController(PickRobotController* robot);
+	void removePickRobotController(PickRobotController& robot);
 	void addWarehouse(Warehouse wh);
-	Warehouse getWarehouse(int id);
+	Warehouse* getWarehouse(int id);
 	void removeWarehouse(Warehouse wh);
 	void removeWarehouse(int warehouseId);
+	void setCollectRobotController(CollectRobotController* collect);
 private:
 	list<Warehouse> warehouses;
-	list<RobotController*> robots;
+	list<PickRobotController*> pickers;
+	CollectRobotController* collector;
 
-	RobotController* getRobotByWarehouse(const Warehouse* wh);
+	PickRobotController* getRobotByWarehouse(const Warehouse* wh);
 };
 
 #endif /* TASKDISTRIBUTER_H_ */

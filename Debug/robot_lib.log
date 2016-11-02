@@ -1,8 +1,11 @@
-﻿  Item.cpp
+﻿  CollectRobotController.cpp
   Generating Code...
   Compiling...
-  RobotController.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
   TaskDistributer.cpp
+c:\users\k.de.coster\documents\visual studio 2015\projects\brainrobot\robot_lib\taskdistributer.cpp(121): warning C4805: '&=': unsafe mix of type 'bool' and type 'int' in operation
+c:\users\k.de.coster\documents\visual studio 2015\projects\brainrobot\robot_lib\taskdistributer.cpp(121): warning C4805: '&': unsafe mix of type 'bool' and type 'int' in operation
+c:\users\k.de.coster\documents\visual studio 2015\projects\brainrobot\robot_lib\taskdistributer.cpp(121): warning C4800: 'int': forcing value to bool 'true' or 'false' (performance warning)
+  PickRobotController.cpp
+  Item.cpp
+  Generating Code...
   robot_lib.vcxproj -> C:\Users\k.de.coster\Documents\Visual Studio 2015\Projects\brainRobot\Debug\robot_lib.lib

@@ -3,6 +3,7 @@
 #define ITEM_H_
 
 #include "Warehouse.h"
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -28,6 +29,7 @@ public:
 	void setTruck(const int truck);
 	string getBarcode() const;
 	void setBarcode(string barcode);
+	void print();
 
 private:
 	int warehouseID;
@@ -39,12 +41,19 @@ private:
 	string barcode;
 };
 
+inline bool operator==(const Item& lhs, const Item& rhs) {
+	if (lhs.getCustomerID() == rhs.getCustomerID() && lhs.getOrderID() == rhs.getOrderID() && lhs.getStorageUnit() == rhs.getStorageUnit() && lhs.getWarehouseID() == rhs.getWarehouseID()) {
+		return true;
+	}
+	return false;
+}
+
 inline bool operator< (const Item& lhs, const Item& rhs) { 
 	// First order by warehouseID, them by storage unit.
-	if (lhs.getWarehouseID() != rhs.getWarehouseID()) {
-		return lhs.getWarehouseID() < rhs.getWarehouseID();
+	if (lhs.getCustomerID() != rhs.getCustomerID()) {
+		return lhs.getCustomerID() < rhs.getCustomerID();
 	}
-	return lhs.getStorageUnit() < rhs.getStorageUnit(); 
+	return lhs.getOrderID() < rhs.getOrderID();
 }
 inline bool operator> (const Item& lhs, const Item& rhs) { return rhs < lhs; }
 inline bool operator<=(const Item& lhs, const Item& rhs) { return !(lhs > rhs); }

@@ -3,7 +3,7 @@
 
 TaskDistributer::TaskDistributer() {
 	// TODO Auto-generated constructor stub
-
+	collector = nullptr;
 }
 
 void TaskDistributer::addWarehouse(Warehouse wh) {
@@ -14,14 +14,15 @@ void TaskDistributer::removeWarehouse(Warehouse wh) {
 	this->warehouses.remove(wh);
 }
 
-Warehouse TaskDistributer::getWarehouse(int id) {
+Warehouse* TaskDistributer::getWarehouse(int id) {
 	for (std::list<Warehouse>::iterator i = this->warehouses.begin(), e = this->warehouses.end(); i != e; )
 	{
 		if (i->getWarehouseId() == id)
-			return *i;
+			return &(*i);
 		else
 			++i;
 	}
+	return nullptr;
 }
 
 void TaskDistributer::removeWarehouse(int warehouseId) {
@@ -34,41 +35,48 @@ void TaskDistributer::removeWarehouse(int warehouseId) {
 	}
 }
 
+void TaskDistributer::setCollectRobotController(CollectRobotController * collect)
+{
+	this->collector = collect;
+}
+
 void TaskDistributer::print() {
 	cout << warehouses.size() << endl;
 }
 
-void TaskDistributer::addRobotController(RobotController* robot)
+void TaskDistributer::addPickRobotController(PickRobotController* robot)
 {
-	this->robots.push_back(robot);
+	this->pickers.push_back(robot);
 }
 
-void TaskDistributer::removeRobotController(RobotController& robot)
+void TaskDistributer::removePickRobotController(PickRobotController& robot)
 {	
-	for (std::list<RobotController*>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
+	for (std::list<PickRobotController*>::iterator i = this->pickers.begin(), e = this->pickers.end(); i != e; )
 	{
 		if ((*i)->getWarehouse().getWarehouseId() == robot.getWarehouse().getWarehouseId())
-			i = this->robots.erase(i);
+			i = this->pickers.erase(i);
 		else
 			++i;
 	}
 }
 
 TaskDistributer::~TaskDistributer() {
-	while (!robots.empty()) {
-		RobotController* rc = robots.front();
+	while (!pickers.empty()) {
+		PickRobotController* rc = pickers.front();
 		delete rc;
-		robots.pop_front();
+		pickers.pop_front();
 	}
 	warehouses.clear();
+	delete collector;
 }
 
 void TaskDistributer::giveOrdersToRobotControllers(queue<Item*> orders)
 {
 	while (!orders.empty()) {
 		Item* tmp = orders.front();
-		if (getRobotByWarehouse(&(getWarehouse(tmp->getWarehouseID()))) != nullptr) {
-			getRobotByWarehouse(&getWarehouse(tmp->getWarehouseID()))->addItemToPick(tmp);
+		collector->addItemToCollect(*tmp);
+		if (getRobotByWarehouse((getWarehouse(tmp->getWarehouseID()))) != nullptr) {
+			getRobotByWarehouse(getWarehouse(tmp->getWarehouseID()))->addItemToPick(tmp);
 		}
 		else {
 			//TODO: write log
@@ -84,6 +92,7 @@ int TaskDistributer::setup(string filePath)
 	if (!myfile) {
 		return EXIT_FAILURE;
 	}
+	collector = new CollectRobotController();
 
 	while (!myfile.eof()) {
 		int whId, rows, cols, p_x, p_y, containerVolume, com, bdrate;
@@ -93,9 +102,9 @@ int TaskDistributer::setup(string filePath)
 		
 		Warehouse warehouse(whId, rows, cols, Point(p_x, p_y));
 		if (find(begin(warehouses), end(warehouses), warehouse) == end(warehouses)) {
-			RobotController* robot = new RobotController(warehouse, Point(p_x, p_y), containerVolume, com, bdrate);
+			PickRobotController* robot = new PickRobotController(warehouse, Point(p_x, p_y), containerVolume, com, bdrate, collector);
 			addWarehouse(warehouse);
-			addRobotController(robot);
+			addPickRobotController(robot);
 		}
 	}
 	myfile.close();
@@ -106,15 +115,16 @@ int TaskDistributer::setup(string filePath)
 bool TaskDistributer::areAllRobotsDone()
 {
 	bool done = true;
-	for (auto& robot : robots) {
+	for (auto& robot : pickers) {
 		done &= robot->isDone();
 	}
+	done &= collector->isDone();
 	return done;
 }
 
-RobotController * TaskDistributer::getRobotByWarehouse(const Warehouse* wh)
+PickRobotController * TaskDistributer::getRobotByWarehouse(const Warehouse* wh)
 {
-	for (std::list<RobotController*>::iterator i = this->robots.begin(), e = this->robots.end(); i != e; )
+	for (std::list<PickRobotController*>::iterator i = this->pickers.begin(), e = this->pickers.end(); i != e; )
 	{
 		if ((*i)->getWarehouse().getWarehouseId() == wh->getWarehouseId())
 			return &**i;

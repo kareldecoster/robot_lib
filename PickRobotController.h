@@ -1,9 +1,10 @@
-#ifndef ROBOTCONTROLLER_H_
-#define ROBOTCONTROLLER_H_
+#ifndef PICKROBOTCONTROLLER_H_
+#define PICKROBOTCONTROLLER_H_
 
 #include "Warehouse.h"
 #include "Point.h"
 #include "Item.h"
+#include "CollectRobotController.h"
 #include <iostream>
 #include <queue>
 
@@ -26,11 +27,11 @@ using namespace std;
 
 enum direction { UP = 'U', DOWN = 'D', LEFT = 'L', RIGHT = 'R', UP_LEFT = 'A', UP_RIGHT = 'B', DOWN_LEFT = 'C', DOWN_RIGHT = 'E'};
 
-class RobotController {
+class PickRobotController {
 public:
-	RobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate);
-	RobotController(RobotController& orig);
-	virtual ~RobotController();
+	PickRobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate, CollectRobotController* collector);
+	PickRobotController(PickRobotController& orig);
+	virtual ~PickRobotController();
 	void addItemsToPick(queue<Item> itemsToPick);
 	void addItemToPick(Item* item);
 	bool isDone(void);
@@ -45,6 +46,7 @@ private:
 	boost::thread* reader;
 	volatile boost::atomic_int readerDone;
 	int cport_nr, bdrate;
+	CollectRobotController* collector;
 
 
 	void readerLoop();
@@ -57,4 +59,4 @@ private:
 
 };
 
-#endif /* ROBOTCONTROLLER_H_ */
+#endif /* PICKROBOTCONTROLLER_H_ */
