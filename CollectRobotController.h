@@ -12,7 +12,7 @@ public:
 	~CollectRobotController();
 	void addItemToCollect(Item item);
 	void addItemReadyToCollect(Item item);
-	int isDone();
+	bool isDone();
 
 private:
 	boost::thread* reader;

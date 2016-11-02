@@ -1,17 +1,18 @@
 #include "PickRobotController.h"
+#include "TaskDistributer.h"
 
-PickRobotController::PickRobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate, CollectRobotController* collector) : wh(wh), position(location) {
+PickRobotController::PickRobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate, TaskDistributer* taskdistributer) : wh(wh), position(location) {
 	this->containerVolume = containerVolume;
 	readerDone = 0;
 	this->cport_nr = cport_nr;
 	this->bdrate = bdrate;
-	this->collector = collector;
+	this->taskdistributer = taskdistributer;
 
 	//Initialize everything before starting the new thread.
 	reader = new boost::thread(&PickRobotController::readerLoop, this);
 }
 
-PickRobotController::PickRobotController(PickRobotController & orig) : wh(orig.wh), position(orig.position), containerVolume(orig.containerVolume), cport_nr(orig.cport_nr), bdrate(orig.bdrate), readerDone(orig.readerDone), collector(orig.collector)
+PickRobotController::PickRobotController(PickRobotController & orig) : wh(orig.wh), position(orig.position), containerVolume(orig.containerVolume), cport_nr(orig.cport_nr), bdrate(orig.bdrate), readerDone(orig.readerDone), taskdistributer(orig.taskdistributer)
 {
 	reader = new boost::thread(&PickRobotController::readerLoop, this);
 }
@@ -117,7 +118,7 @@ void PickRobotController::executeRun(vector<Item> route)
 	moveTo(wh.getCollectionPoint());
 	sendAndCheck('Q');
 	while (!inBasket.empty()) {
-		collector->addItemReadyToCollect(inBasket.back());
+		taskdistributer->addItemReadyToCollect(inBasket.back());
 		inBasket.pop_back();
 	}
 }

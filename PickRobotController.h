@@ -4,7 +4,6 @@
 #include "Warehouse.h"
 #include "Point.h"
 #include "Item.h"
-#include "CollectRobotController.h"
 #include <iostream>
 #include <queue>
 
@@ -22,6 +21,7 @@
 #endif
 
 #include "rs232.h"
+class TaskDistributer; // declare here
 
 using namespace std;
 
@@ -29,7 +29,7 @@ enum direction { UP = 'U', DOWN = 'D', LEFT = 'L', RIGHT = 'R', UP_LEFT = 'A', U
 
 class PickRobotController {
 public:
-	PickRobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate, CollectRobotController* collector);
+	PickRobotController(Warehouse& wh, Point& location, int containerVolume, int cport_nr, int bdrate, TaskDistributer* taskdistributer);
 	PickRobotController(PickRobotController& orig);
 	virtual ~PickRobotController();
 	void addItemsToPick(queue<Item> itemsToPick);
@@ -46,7 +46,7 @@ private:
 	boost::thread* reader;
 	volatile boost::atomic_int readerDone;
 	int cport_nr, bdrate;
-	CollectRobotController* collector;
+	TaskDistributer* taskdistributer;
 
 
 	void readerLoop();

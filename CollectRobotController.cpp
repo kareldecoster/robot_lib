@@ -21,23 +21,7 @@ vector<Item> CollectRobotController::getItemsToCollectByOrder(int order) {
 
 CollectRobotController::~CollectRobotController()
 {
-	/*Item tmp;
-	cout << "Need to collect the following items..\n";
-	mutexForToCollect.lock();
-	while (!itemsToCollect.empty()) {
-		tmp = itemsToCollect.back();
-		cout << tmp.getStorageUnit() << '\t' << tmp.getCustomerID() << '\t' << tmp.getOrderID() << endl;
-		itemsToCollect.pop_back();
-	}
-	mutexForToCollect.unlock();
-	cout << "Ready to collect the following items..\n";
-	mutexForReady.lock();
-	while (!itemsReadyToCollect.empty()) {
-		tmp = itemsReadyToCollect.back();
-		cout << tmp.getStorageUnit() << '\t' << tmp.getCustomerID() << '\t' << tmp.getOrderID() << endl;
-		itemsReadyToCollect.pop_back();
-	}
-	mutexForReady.unlock();*/
+
 	readerDone = 1;
 	reader->join();
 }
@@ -56,7 +40,7 @@ void CollectRobotController::addItemReadyToCollect(Item item)
 	mutexForReady.unlock();
 }
 
-int CollectRobotController::isDone()
+bool CollectRobotController::isDone()
 {
 	return itemsReadyToCollect.empty() && itemsToCollect.empty();
 }

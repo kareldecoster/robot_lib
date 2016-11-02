@@ -102,7 +102,7 @@ int TaskDistributer::setup(string filePath)
 		
 		Warehouse warehouse(whId, rows, cols, Point(p_x, p_y));
 		if (find(begin(warehouses), end(warehouses), warehouse) == end(warehouses)) {
-			PickRobotController* robot = new PickRobotController(warehouse, Point(p_x, p_y), containerVolume, com, bdrate, collector);
+			PickRobotController* robot = new PickRobotController(warehouse, Point(p_x, p_y), containerVolume, com, bdrate, this);
 			addWarehouse(warehouse);
 			addPickRobotController(robot);
 		}
@@ -132,4 +132,8 @@ PickRobotController * TaskDistributer::getRobotByWarehouse(const Warehouse* wh)
 			++i;
 	}
 	return nullptr;
+}
+
+void TaskDistributer::addItemReadyToCollect(Item item) {
+	this->collector->addItemReadyToCollect(item);
 }

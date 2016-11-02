@@ -25,6 +25,7 @@ public:
 	bool areAllRobotsDone();
 	void giveOrdersToRobotControllers(queue<Item*> orders);
 	virtual ~TaskDistributer();
+	void addItemReadyToCollect(Item item);
 
 	// Make private..?
 	void addPickRobotController(PickRobotController* robot);
