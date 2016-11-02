@@ -2,7 +2,6 @@
 #ifndef ITEM_H_
 #define ITEM_H_
 
-#include "Warehouse.h"
 #include <iostream>
 #include <string>
 
